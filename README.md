@@ -5,6 +5,9 @@
 <a href='https://huggingface.co/koulx/roboannotatorx'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-blue'></a>
 <a href='https://huggingface.co/datasets/koulx/RoboX-VQA'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Data-green'></a>
 
+>[!IMPORTANT]
+> This fork contains fixes for RoboAnnotatorX to get it running for RoboG evaluation.
+
 A reliable annotation tool that enhances multimodal large language model to generate high-quality, 
 context-rich annotations for complex long-horizon robotics demonstrations.
 
