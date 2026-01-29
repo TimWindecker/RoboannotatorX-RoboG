@@ -55,6 +55,19 @@ def load_roboannotator(model_path, model_base=None, load_8bit=False, load_4bit=F
 
     print('Loading Vision Module...')
     model.get_model().initialize_vision_modules(model_args=model.config, for_eval=True)
+    ### Fix loading mm_projector.bin
+    # Explicitly load mm_projector.bin if present
+    mm_path = os.path.join(model_path, "mm_projector.bin")
+    if os.path.exists(mm_path):
+        print("Loading mm_projector weights from mm_projector.bin")
+        mm_weights = torch.load(mm_path, map_location="cpu")
+        # Strip prefix if needed
+        mm_weights = {
+            k.replace("mm_projector.", "") if k.startswith("mm_projector.") else k: v
+            for k, v in mm_weights.items()
+        }
+        model.get_model().mm_projector.load_state_dict(mm_weights, strict=False)
+    ### End fix
     image_processor = model.get_vision_tower().image_processor
 
     print('Loading Attention Module...')
@@ -69,9 +82,11 @@ def load_roboannotator(model_path, model_base=None, load_8bit=False, load_4bit=F
 
         model.load_state_dict(non_lora_trainables, strict=False)
 
-    if hasattr(model.config, "max_sequence_length"):
-        context_len = model.config.max_sequence_length
-    else:
-        context_len = 2048
+    context_len = getattr(
+        model.config,
+        "max_sequence_length",
+        getattr(model.config, "max_position_embeddings", 2048)
+    )
+
 
     return tokenizer, model, image_processor, context_len
